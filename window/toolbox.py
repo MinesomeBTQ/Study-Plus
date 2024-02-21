@@ -7,6 +7,7 @@ from PyQt5 import QtGui as gui
 import json
 import shutil
 import webbrowser
+import time as _time
 
 from PyQt5.QtWidgets import QWidget
 
@@ -92,6 +93,7 @@ class toolbox(widgets.QWidget):
                 webbrowser.open('https://gitee.com/Nernge/studyplus')
             if evt == act_exit:
                 self.mainWindow.thread_run = False
+                _time.sleep(0.01)
                 self.mainWindow.thread_schedule.quit()
                 self.mainWindow.thread_file_starter.quit()
                 self.mainWindow.app.quit()

@@ -19,7 +19,7 @@ from window import setting, randoms, toolbox, schedule, file_starter
 
 data = json.loads(read(r'data\mainWindow.json'))
 
-__version__ = __true_version__ = 'v1.0.4'
+__version__ = __true_version__ = 'v1.0.5'
 
 
 class mainWindow(widgets.QMainWindow):
@@ -94,6 +94,8 @@ class mainWindow(widgets.QMainWindow):
                             _time.sleep(1.1)
                 except json.decoder.JSONDecodeError:
                     pass
+                if self.thread_run:
+                    _time.sleep(0.01)
 
         self.thread_schedule.run = run
         self.thread_schedule.start()
@@ -111,6 +113,8 @@ class mainWindow(widgets.QMainWindow):
                             _time.sleep(1.1)
                 except json.decoder.JSONDecodeError:
                     pass
+                if self.thread_run:
+                    _time.sleep(0.01)
 
         self.thread_file_starter.run = file_start
         self.thread_file_starter.start()
@@ -259,6 +263,7 @@ class mainWindow(widgets.QMainWindow):
                 webbrowser.open('https://gitee.com/Nernge/studyplus')
             if evt == act_exit:
                 self.thread_run = False
+                _time.sleep(0.01)
                 self.thread_schedule.quit()
                 self.thread_file_starter.quit()
                 self.app.quit()
