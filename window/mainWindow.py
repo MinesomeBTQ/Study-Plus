@@ -19,7 +19,7 @@ from window import setting, randoms, toolbox, schedule, file_starter
 
 data = json.loads(read(r'data\mainWindow.json'))
 
-__version__ = __true_version__ = 'v1.0.2'
+__version__ = __true_version__ = 'v1.0.4'
 
 
 class mainWindow(widgets.QMainWindow):
