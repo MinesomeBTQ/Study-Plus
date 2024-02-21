@@ -1,4 +1,4 @@
-# Study Plus v 1.0.3
+# Study Plus v 1.0.4
 
 一款使用Python开发的可用于课堂多媒体教学的工具集
 
