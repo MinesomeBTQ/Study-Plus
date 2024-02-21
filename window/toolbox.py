@@ -114,13 +114,14 @@ class toolbox(widgets.QWidget):
         self.main.setContextMenuPolicy(core.Qt.CustomContextMenu)
         self.main.customContextMenuRequested.connect(show_menu)
 
-    def setupUI(self, evt=None):
+    def setupUI(self, evt=None, wh=0):
         global data
         data = json.loads(read(r'data\mainWindow.json'))
         screen = widgets.QDesktopWidget().screenGeometry()
         w, h = screen.width() * self.w / 1920, screen.height() * self.h / 1080
         if type(evt) is float or evt is None:
-            self.setFixedSize(int(w), int(h))
+            self.resize(int(self.w * (screen.width() + screen.height()) / 3000),
+                        int(self.h * (screen.width() + screen.height()) / 3000))
         dpi = self.screen().logicalDotsPerInch() / 96
 
         def font(size_):
@@ -129,10 +130,17 @@ class toolbox(widgets.QWidget):
             return f
 
         w, h = self.width(), self.height()
+        size = lambda x2, y2: core.QRect(0, 0, int(x2 * (screen.width() + screen.height()) / 3000),
+                                         int(y2 * (screen.width() + screen.height()) / 3000))
 
-        self.main_bg.setGeometry(0, 0, data['width-height'], data['width-height'])
-        self.main.setGeometry(0, 0, data['width-height'], data['width-height'])
-        self.text.setGeometry(0, 0, data['width-height'], data['width-height'])
+        if wh == 0:
+            self.main_bg.setGeometry(size(self.w, self.h))
+            self.main.setGeometry(size(self.w, self.h))
+            self.text.setGeometry(size(self.w, self.h))
+        else:
+            self.main_bg.setGeometry(size(wh, wh))
+            self.main.setGeometry(size(wh, wh))
+            self.text.setGeometry(size(wh, wh))
 
         self.text.setFont(font(12))
 

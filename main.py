@@ -6,14 +6,12 @@ import os
 from function import func
 
 
-from window import mainWindow
-
-
 if __name__ == '__main__':
     # core.QCoreApplication.setAttribute(core.Qt.AA_EnableHighDpiScaling)
     app = widgets.QApplication(sys.argv)
     app.path = os.path.basename(__file__)
     app.setStyleSheet(func.read(r'data\static\menu.qss'))
+    from window import mainWindow
     window = mainWindow.mainWindow(app)
     try:
         if not json.loads(func.read(r'data\mainWindow.json'))['hide']:

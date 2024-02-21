@@ -28,6 +28,8 @@ class mainWindow(widgets.QMainWindow):
         self.setWindowTitle('Study Plus')
         self.setObjectName('mainWindow')
         self.setWindowIcon(gui.QIcon('data/images/favicon.ico'))
+        import ctypes
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
         self.loadStyle()
 
         self.title = widgets.QLabel(self)  # 标题

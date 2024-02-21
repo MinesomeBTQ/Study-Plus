@@ -471,6 +471,36 @@ QTableWidget::item:focus {
     background: #1e9fff;
 }
 
+QCheckBox::indicator {
+    border: 1px solid #d2d2d2;
+    border-radius: 4px;
+    width: 15px;
+    height: 15px;
+}
+
+QCheckBox::indicator:hover {
+    border-color: @MAIN-COLOR;
+}
+
+QCheckBox::indicator:checked {
+    background-image: url("data/images/check.png");
+}
+
+QRadioButton::indicator {
+    border: 1px solid #d2d2d2;
+    border-radius: 4px;
+    width: 15px;
+    height: 15px;
+}
+
+QRadioButton::indicator:hover {
+    border-color: @MAIN-COLOR;
+}
+
+QRadioButton::indicator:checked {
+    background-image: url("data/images/check.png");
+}
+
 #title {
     color: @MAIN-COLOR;
 }

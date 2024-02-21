@@ -205,25 +205,16 @@ class setting(widgets.QMainWindow):
 
         self.edit_op.valueChanged.connect(set_op)
 
-        self.toolbox_wh.setTitle('边长 - px')
+        self.toolbox_wh.setTitle('边长')
         self.edit_wh.setRange(10, 360)
         self.edit_wh.setValue(data['width-height'])
 
         def set_wh():
             data['width-height'] = self.edit_wh.value()
             write(r'data\mainWindow.json', json.dumps(data))
-            self.mainWindow.toolbox_window.main_bg.setGeometry(
-                core.QRect(0, 0, self.edit_wh.value(), self.edit_wh.value())
-            )
-            self.mainWindow.toolbox_window.main.setGeometry(
-                core.QRect(0, 0, self.edit_wh.value(), self.edit_wh.value())
-            )
-            self.mainWindow.toolbox_window.text.setGeometry(
-                core.QRect(0, 0, self.edit_wh.value(), self.edit_wh.value())
-            )
             self.mainWindow.toolbox_window.w = self.edit_wh.value()
             self.mainWindow.toolbox_window.h = self.edit_wh.value()
-            self.mainWindow.toolbox_window.setupUI()
+            self.mainWindow.toolbox_window.setupUI(wh=self.edit_wh.value())
 
         self.edit_wh.valueChanged.connect(set_wh)
 
@@ -250,7 +241,7 @@ class setting(widgets.QMainWindow):
 
         self.check_hide.clicked.connect(set_hide)
 
-        self.help.setText('<a href="https://gitee.com/Nernge/studyplus" style="color: #666666;">获取 Study Pro 使用帮助</a>')
+        self.help.setText('<a href="https://gitee.com/Nernge/studyplus" style="color: #666666;">获取 Study Plus 使用帮助</a>')
         self.help.setOpenExternalLinks(True)
 
     def setupUI(self, evt=None):
@@ -319,6 +310,7 @@ class setting(widgets.QMainWindow):
         self.edit_op.setFont(font(9))
         self.edit_wh.setFont(font(9))
         self.check_hide.setFont(font(10))
+        self.toolbox_show.setFont(font(10))
         self.help.setFont(font(10))
 
     def closeEvent(self, evt):
