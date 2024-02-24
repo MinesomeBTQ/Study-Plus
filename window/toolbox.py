@@ -74,6 +74,7 @@ class toolbox(widgets.QWidget):
         act_randoms = widgets.QAction('随机抽号 (&R)', self)
         act_schedule = widgets.QAction('课程表 (&S)', self)
         act_file_starter = widgets.QAction('文件定时启动（&F）', self)
+        act_ai = widgets.QAction('Nernge AI（&N）', self)
         act_setting = widgets.QAction('设置 (&S)', self)
         act_help = widgets.QAction('帮助 (&H)', self)
 
@@ -84,11 +85,13 @@ class toolbox(widgets.QWidget):
             if evt == act_randoms:
                 self.mainWindow.randoms()
             if evt == act_schedule:
-                self.mainWindow.file_starter()
+                self.mainWindow.schedule()
             if evt == act_setting:
                 self.mainWindow.setting()
             if evt == act_file_starter:
                 self.mainWindow.file_starter()
+            if evt == act_ai:
+                self.mainWindow.ai()
             if evt == act_help:
                 webbrowser.open('https://gitee.com/Nernge/studyplus')
             if evt == act_exit:
@@ -103,6 +106,7 @@ class toolbox(widgets.QWidget):
         menu.addAction(act_randoms)
         menu.addAction(act_schedule)
         menu.addAction(act_file_starter)
+        menu.addAction(act_ai)
         menu.addAction(act_setting)
         menu.addSeparator()
         menu.addAction(act_help)

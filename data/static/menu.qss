@@ -1,27 +1,6 @@
 QMenu {
     background: rgb(255, 255, 255);
-    border: 1px solid #333333;
-    padding: 10px;
-    color: #333333;
-}
-
-QMenu::item {
-    border-radius: 4px;
-    padding: 5px;
-}
-
-QMenu::item:selected {
-    background: #1e9fff;
-    color: #FFFFFF;
-}
-
-QMenu::separator {
-    color: #d2d2d2;
-}
-
-QMenu {
-    background: rgb(255, 255, 255);
-    border: 1px solid #333333;
+    border: 1px solid #d2d2d2;
     padding: 10px;
     color: #333333;
 }

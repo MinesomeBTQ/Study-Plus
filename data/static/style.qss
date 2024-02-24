@@ -327,6 +327,15 @@ QTextEdit:focus {
     border: 2px solid @MAIN-COLOR;
 }
 
+#ReadOnly:hover {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #d2d2d2;
+}
+#ReadOnly:focus {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #d2d2d2;
+}
+
 QComboBox {
     background: rgba(255, 255, 255, 0.5);
     border: 1px solid #d2d2d2;
@@ -499,6 +508,12 @@ QRadioButton::indicator:hover {
 
 QRadioButton::indicator:checked {
     background-image: url("data/images/check.png");
+}
+
+QScrollArea {
+    border: 1px solid #d2d2d2;
+    border-radius: 4px;
+    background: #FFFFFF;
 }
 
 #title {

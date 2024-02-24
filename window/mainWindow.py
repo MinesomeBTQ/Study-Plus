@@ -15,11 +15,11 @@ create(r'data\mainWindow.json', '{"background-image": "bg_blue.png", "main-color
                                 '"width-height": 60, "hide": false, "toolbox": true}')
 # 记得更改配置文件检测
 
-from window import setting, randoms, toolbox, schedule, file_starter
+from window import setting, randoms, toolbox, schedule, file_starter, nernge_ai
 
 data = json.loads(read(r'data\mainWindow.json'))
 
-__version__ = __true_version__ = 'v1.0.5'
+__version__ = __true_version__ = 'v1.1.0'
 
 
 class mainWindow(widgets.QMainWindow):
@@ -38,6 +38,7 @@ class mainWindow(widgets.QMainWindow):
         self.schedule_btn = widgets.QPushButton(self)  # 课程表设置
         self.file_starter_btn = widgets.QPushButton(self)  # 文件定时启动设置
         self.setting_btn = widgets.QPushButton(self)  # 设置
+        self.ai_btn = widgets.QPushButton(self)  # Nernge AI
 
         self.w = 800
         self.h = 600
@@ -66,6 +67,7 @@ class mainWindow(widgets.QMainWindow):
         self.schedule_window = schedule.schedule(self)
         self.file_starter_window = file_starter.file_starter(self)
         self.toolbox_window = toolbox.toolbox(self)
+        self.ai_window = nernge_ai.ai(self)
         if data['toolbox']:
             self.toolbox()
         self.tray()
@@ -155,6 +157,7 @@ class mainWindow(widgets.QMainWindow):
             self.toolbox_window.loadStyle()
             self.schedule_window.loadStyle()
             self.file_starter_window.loadStyle()
+            self.ai_window.loadStyle()
         except AttributeError:
             pass
 
@@ -187,6 +190,11 @@ class mainWindow(widgets.QMainWindow):
         self.setting_btn.setCursor(Qt.Qt.PointingHandCursor)
         self.setting_btn.clicked.connect(self.setting)
 
+        self.ai_btn.setText('Nernge AI')
+        self.ai_btn.setObjectName('btn-b')
+        self.ai_btn.setCursor(Qt.Qt.PointingHandCursor)
+        self.ai_btn.clicked.connect(self.ai)
+
     def setupUI(self, evt=None):
         screen = widgets.QDesktopWidget().screenGeometry()
         w, h = screen.width() * self.w / 1920, screen.height() * self.h / 1080
@@ -207,9 +215,10 @@ class mainWindow(widgets.QMainWindow):
         self.title.setGeometry(size(50, 0, 325, 200))
         self.subtitle.setGeometry(size(50, 125, 325, 75))
         self.random_btn.setGeometry(size(50, 200, 325, 250))
-        self.schedule_btn.setGeometry(size(420, 50, 325, 225))
-        self.file_starter_btn.setGeometry(size(420, 325, 325, 225))
+        self.schedule_btn.setGeometry(size(420, 50, 325, 150))
+        self.file_starter_btn.setGeometry(size(420, 225, 325, 150))
         self.setting_btn.setGeometry(size(50, 475, 325, 75))
+        self.ai_btn.setGeometry(size(420, 400, 325, 150))
 
         self.title.setFont(font(40))
         self.subtitle.setFont(font(10))
@@ -217,6 +226,7 @@ class mainWindow(widgets.QMainWindow):
         self.schedule_btn.setFont(font(18))
         self.file_starter_btn.setFont(font(18))
         self.setting_btn.setFont(font(18))
+        self.ai_btn.setFont(font(18))
 
     def setting(self):
         self.setting_window.close()
@@ -237,6 +247,10 @@ class mainWindow(widgets.QMainWindow):
     def toolbox(self):
         self.toolbox_window.show()
 
+    def ai(self):
+        self.ai_window.close()
+        self.ai_window.show()
+
     def tray(self):
         menu = widgets.QMenu()
         act_show = QAction("打开主窗口 (&O)", self)
@@ -244,6 +258,7 @@ class mainWindow(widgets.QMainWindow):
         act_randoms = QAction('随机抽号 (&R)', self)
         act_schedule = QAction('课程表 (&S)', self)
         act_file_starter = QAction('文件定时启动（&F）', self)
+        act_ai = QAction('Nernge AI（&N）', self)
         act_setting = QAction('设置 (&S)', self)
         act_help = QAction('帮助 (&H)', self)
 
@@ -259,6 +274,8 @@ class mainWindow(widgets.QMainWindow):
                 self.setting()
             if evt == act_file_starter:
                 self.file_starter()
+            if evt == act_ai:
+                self.ai()
             if evt == act_help:
                 webbrowser.open('https://gitee.com/Nernge/studyplus')
             if evt == act_exit:
@@ -273,6 +290,7 @@ class mainWindow(widgets.QMainWindow):
         menu.addAction(act_randoms)
         menu.addAction(act_schedule)
         menu.addAction(act_file_starter)
+        menu.addAction(act_ai)
         menu.addAction(act_setting)
         menu.addSeparator()
         menu.addAction(act_help)

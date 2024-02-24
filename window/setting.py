@@ -31,6 +31,7 @@ class setting(widgets.QMainWindow):
         self.tab = widgets.QTabWidget(self)
         self.tab_1 = widgets.QWidget(self)
         self.tab_2 = widgets.QWidget(self)
+        self.tab_3 = widgets.QWidget(self)
 
         self.bg_setting = widgets.QGroupBox(self.tab_1)
         self.txt_bg = widgets.QLabel(self.bg_setting)
@@ -54,6 +55,9 @@ class setting(widgets.QMainWindow):
         self.check_hide = widgets.QCheckBox(self.tab_2)
         self.toolbox_show = widgets.QCheckBox(self.tab_2)
         self.help = widgets.QLabel(self.tab_2)
+
+        self.set_ai = widgets.QGroupBox(self.tab_3)
+        self.edit_ai = widgets.QLineEdit(self.set_ai)
 
         self.mainWindow = mainWindow  # 主窗口类
         self.w = 600
@@ -80,6 +84,7 @@ class setting(widgets.QMainWindow):
         # 选项卡
         self.tab.addTab(self.tab_1, '外观设置')
         self.tab.addTab(self.tab_2, '悬浮球设置')
+        self.tab.addTab(self.tab_3, 'AI设置')
 
         # 文本
         self.bg_setting.setTitle('设置背景')
@@ -241,8 +246,17 @@ class setting(widgets.QMainWindow):
 
         self.check_hide.clicked.connect(set_hide)
 
-        self.help.setText('<a href="https://gitee.com/Nernge/studyplus" style="color: #666666;">获取 Study Plus 使用帮助</a>')
+        self.help.setText(
+            '<a href="https://gitee.com/Nernge/studyplus" style="color: #666666;">获取 Study Plus 使用帮助</a>')
         self.help.setOpenExternalLinks(True)
+
+        self.set_ai.setTitle('设置 API-Key')
+        self.edit_ai.setText(read(r'data\static\api-key'))
+
+        def edit_ai():
+            write(r'data\static\api-key', self.edit_ai.text())
+
+        self.edit_ai.textChanged.connect(edit_ai)
 
     def setupUI(self, evt=None):
         screen = widgets.QDesktopWidget().screenGeometry()
@@ -286,6 +300,9 @@ class setting(widgets.QMainWindow):
 
         self.help.setGeometry(size(25, 400, 550, 25))
 
+        self.set_ai.setGeometry(size(25, 5, 550, 75))
+        self.edit_ai.setGeometry(size(25, 30, 500, 25))
+
         self.tab.setStyleSheet('QTabBar::title{background: #FFFFFF;font-size: %spt;}'
                                'height: %s;' % (
                                    int((9 * w / (self.w * dpi) + 9 * h / (self.h * dpi)) / 2),
@@ -312,6 +329,9 @@ class setting(widgets.QMainWindow):
         self.check_hide.setFont(font(10))
         self.toolbox_show.setFont(font(10))
         self.help.setFont(font(10))
+
+        self.set_ai.setFont(font(10))
+        self.edit_ai.setFont(font(9))
 
     def closeEvent(self, evt):
         if self.mainWindow.isVisible():
