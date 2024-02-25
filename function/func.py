@@ -7,17 +7,17 @@ from PyQt5.QtGui import QIcon
 
 def create(filepath, content=''):
     if not os.path.exists(filepath):
-        with open('%s\\%s' % (os.getcwd(), filepath), 'w+', encoding='utf-8') as file:
+        with open(filepath, 'w+', encoding='utf-8') as file:
             file.write(content)
 
 
 def read(filepath):
-    with open('%s\\%s' % (os.getcwd(), filepath), 'r', encoding='utf-8') as file:
+    with open(filepath, 'r', encoding='utf-8') as file:
         return file.read()
 
 
 def write(filepath, content=''):
-    with open('%s\\%s' % (os.getcwd(), filepath), 'w+', encoding='utf-8') as file:
+    with open(filepath, 'w+', encoding='utf-8') as file:
         file.write(content)
 
 

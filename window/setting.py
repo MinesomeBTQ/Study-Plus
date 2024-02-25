@@ -197,7 +197,7 @@ class setting(widgets.QMainWindow):
 
         self.import_color.clicked.connect(import_color_)
 
-        self.toolbox_op.setTitle('透明度 - %')
+        self.toolbox_op.setTitle('不透明度 - %')
         self.edit_op.setValue(data['opacity'])
         self.edit_op.setRange(0, 100)
 

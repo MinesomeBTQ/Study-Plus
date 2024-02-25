@@ -6,7 +6,7 @@ from function.func import *
 def chat(content, history_message=''):
     api_key = read(r'data\static\api-key')
     if not api_key:
-        api_key = ""  # API Key，请自行替换
+        api_key = "sk-sCTWh4NJjgBsKQt8esjSPsc4S2gj6l5W5VicjXEAkrj5qLuE"  # API Key，请自行替换
     client = OpenAI(
         api_key=api_key,
         base_url="https://api.moonshot.cn/v1",

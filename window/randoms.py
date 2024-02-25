@@ -16,6 +16,7 @@ data = json.loads(read(r'data\mainWindow.json'))
 class randoms(widgets.QMainWindow):
     def __init__(self, mainWindow):
         super(randoms, self).__init__()
+        self.signal = False
         self.bg_self = None
         self.setWindowTitle('Study Plus - 随机抽号')
         self.setWindowIcon(gui.QIcon('data/images/favicon.ico'))
@@ -91,18 +92,20 @@ class randoms(widgets.QMainWindow):
         def get_num_min():
             self.data['num'][0] = self.get_num_min.value()
             write(r'data\randoms.json', json.dumps(self.data))
-            self.get_num_max.setMinimum(self.get_num_min.value())
+            if self.signal:
+                self.get_num_max.setMinimum(self.get_num_min.value())
 
         def get_num_max():
             self.data['num'][1] = self.get_num_max.value()
             write(r'data\randoms.json', json.dumps(self.data))
-            self.get_num_min.setMaximum(self.get_num_max.value())
+            if self.signal:
+                self.get_num_min.setMaximum(self.get_num_max.value())
+                self.signal = True
 
         self.get_num_min.valueChanged.connect(get_num_min)
         self.get_num_max.valueChanged.connect(get_num_max)
         self.get_num_min.setValue(self.data['num'][0])
         self.get_num_max.setValue(self.data['num'][1])
-
         self.import_.setTitle('自定义抽号')
         self.list.addItems(self.data['import'])
         self.btn_add.setText('添加')

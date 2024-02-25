@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QAction
 
 from function.func import *
 
-create(r'data\mainWindow.json', '{"background-image": "bg_blue.png", "main-color": "#1e9fff", "opacity": 60, '
+create(r'data\mainWindow.json', '{"background-image": "bg_blue.png", "main-color": "#1e9fff", "opacity": 80, '
                                 '"width-height": 60, "hide": false, "toolbox": true}')
 # 记得更改配置文件检测
 
@@ -19,7 +19,7 @@ from window import setting, randoms, toolbox, schedule, file_starter, nernge_ai
 
 data = json.loads(read(r'data\mainWindow.json'))
 
-__version__ = __true_version__ = 'v1.1.0'
+__version__ = __true_version__ = 'v1.1.1'
 
 
 class mainWindow(widgets.QMainWindow):

@@ -29,7 +29,7 @@ class toolbox(widgets.QWidget):
         self.main_bg = QWidget(self)
         self.main_bg.setObjectName('toolbox-bg')
         op = widgets.QGraphicsOpacityEffect(self)
-        op.setOpacity(data['opacity'])
+        op.setOpacity(data['opacity'] / 100)
         self.main_bg.setGraphicsEffect(op)
         self.main = QWidget(self)
         self.main.setObjectName('toolbox')
