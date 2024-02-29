@@ -10,13 +10,6 @@ import getpass
 
 from function.func import *
 
-create('data/static/color.json',
-       '{"未来科技蓝": "#1e9fff", "活力橙": "#ff5722", "学习绿": "#39C839", "简约灰": "#aaaaaa", "古典红": "#87362b", '
-       '"山水青": "#598AAA", "经典黑": "#333333", "自定义颜色": "#333333"}')
-create('data/static/bg.json',
-       '{"未来科技蓝": "bg_blue.png", "活力橙": "bg_orange.png", "学习绿": "bg_green.png", "简约灰": "bg_gray.png",'
-       '"古典红": "bg_red.jpg", "现代深": "bg_black.jpg", "山水": "bg_mountain.png", "纯白": "bg_white.png",'
-       '"自定义背景": "bg_white.png"}')
 data = json.loads(read(r'data\mainWindow.json'))
 
 
@@ -58,6 +51,8 @@ class setting(widgets.QMainWindow):
 
         self.set_ai = widgets.QGroupBox(self.tab_3)
         self.edit_ai = widgets.QLineEdit(self.set_ai)
+        self.set_setting = widgets.QGroupBox(self.tab_3)
+        self.edit_setting = widgets.QLineEdit(self.set_setting)
 
         self.mainWindow = mainWindow  # 主窗口类
         self.w = 600
@@ -65,6 +60,7 @@ class setting(widgets.QMainWindow):
         self.bg_list = json.loads(read('data/static/bg.json'))
         self.color_list = json.loads(read('data/static/color.json'))
         self.bg = data['background-image']
+        self.ai_data = json.loads(read(r'data\nernge_ai.json'))
 
         self.screen().logicalDotsPerInchChanged.connect(self.setupUI)
         self.resizeEvent = self.setupUI
@@ -78,6 +74,8 @@ class setting(widgets.QMainWindow):
             '@BACKGROUND-IMAGE', data['background-image']
         ).replace(
             '@MAIN-COLOR', data['main-color']
+        ).replace(
+            '@WH', str(int(widgets.QDesktopWidget().screenGeometry().width() * 15 / 1920))+'px'
         ))
 
     def initUI(self):
@@ -251,12 +249,22 @@ class setting(widgets.QMainWindow):
         self.help.setOpenExternalLinks(True)
 
         self.set_ai.setTitle('设置 API-Key')
-        self.edit_ai.setText(read(r'data\static\api-key'))
+        self.edit_ai.setText(self.ai_data['api-key'])
 
         def edit_ai():
-            write(r'data\static\api-key', self.edit_ai.text())
+            self.ai_data['api-key'] = self.edit_ai.text()
+            write(r'data\nernge_ai.json', json.dumps(self.ai_data))
 
         self.edit_ai.textChanged.connect(edit_ai)
+
+        self.set_setting.setTitle('设置 AI 默认设定')
+        self.edit_setting.setText(self.ai_data['setting'])
+
+        def edit_setting():
+            self.ai_data['setting'] = self.edit_setting.text()
+            write(r'data\nernge_ai.json', json.dumps(self.ai_data))
+
+        self.edit_setting.textChanged.connect(edit_setting)
 
     def setupUI(self, evt=None):
         screen = widgets.QDesktopWidget().screenGeometry()
@@ -302,6 +310,8 @@ class setting(widgets.QMainWindow):
 
         self.set_ai.setGeometry(size(25, 5, 550, 75))
         self.edit_ai.setGeometry(size(25, 30, 500, 25))
+        self.set_setting.setGeometry(size(25, 105, 550, 75))
+        self.edit_setting.setGeometry(size(25, 30, 500, 25))
 
         self.tab.setStyleSheet('QTabBar::title{background: #FFFFFF;font-size: %spt;}'
                                'height: %s;' % (
@@ -332,6 +342,8 @@ class setting(widgets.QMainWindow):
 
         self.set_ai.setFont(font(10))
         self.edit_ai.setFont(font(9))
+        self.set_setting.setFont(font(10))
+        self.edit_setting.setFont(font(9))
 
     def closeEvent(self, evt):
         if self.mainWindow.isVisible():

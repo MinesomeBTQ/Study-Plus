@@ -9,6 +9,9 @@ def create(filepath, content=''):
     if not os.path.exists(filepath):
         with open(filepath, 'w+', encoding='utf-8') as file:
             file.write(content)
+        return False
+    else:
+        return True
 
 
 def read(filepath):

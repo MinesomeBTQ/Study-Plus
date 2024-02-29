@@ -9,17 +9,6 @@ import shutil
 
 from function.func import *
 
-create('data/schedule.json', '{"time": [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], '
-                             '[0, 0, 0], [0, 0, 0]], "1": {"0": "", "1": "", "2": "", "3": "", "4": "", "5": "", '
-                             '"6": "", "7": "", "8": ""}, "2": {"0": "", "1": "", "2": "", "3": "", "4": "", "5": "", '
-                             '"6": "", "7": "", "8": ""}, "3": {"0": "", "1": "", "2": "", "3": "", "4": "", "5": "", '
-                             '"6": "", "7": "", "8": ""}, "4": {"0": "", "1": "", "2": "", "3": "", "4": "", "5": "", '
-                             '"6": "", "7": "", "8": ""}, "5": {"0": "", "1": "", "2": "", "3": "", "4": "", "5": "", '
-                             '"6": "", "7": "", "8": ""}, "6": {"0": "", "1": "", "2": "", "3": "", "4": "", "5": "", '
-                             '"6": "", "7": "", "8": ""}, "7": {"0": "", "1": "", "2": "", "3": "", "4": "", "5": "", '
-                             '"6": "", "7": "", "8": ""}}')
-create('data/schedule_func.json', '{"func": true, "text": "@N\u8bfe\u5f00\u59cb\u4e86\uff0c\u8bf7\u5927\u5bb6\u505a'
-                                  '\u597d\u51c6\u5907~"}')
 data = json.loads(read(r'data\mainWindow.json'))
 
 
@@ -34,8 +23,8 @@ class schedule(widgets.QMainWindow):
         self.table = widgets.QTableWidget(self)
         self.txt_1 = widgets.QLabel(self)
         self.txt_2 = widgets.QLabel(self)
-        self.on = widgets.QRadioButton(self)
-        self.off = widgets.QRadioButton(self)
+        self.system_msg = widgets.QCheckBox(self)
+        self.window_msg = widgets.QCheckBox(self)
         self.edit = widgets.QTextEdit(self)
 
         self.mainWindow = mainWindow  # 主窗口类
@@ -57,6 +46,8 @@ class schedule(widgets.QMainWindow):
             '@BACKGROUND-IMAGE', data['background-image']
         ).replace(
             '@MAIN-COLOR', data['main-color']
+        ).replace(
+            '@WH', str(int(widgets.QDesktopWidget().screenGeometry().width() * 15 / 1920))+'px'
         ))
 
     def initUI(self):
@@ -216,24 +207,32 @@ class schedule(widgets.QMainWindow):
 
         self.table.cellChanged.connect(set_table)
 
-        self.txt_1.setText('课程表定时通知')
-        self.on.setText('开启')
-        self.off.setText('关闭')
-        if self.data_func['func']:
-            self.on.setChecked(True)
-        else:
-            self.off.setChecked(True)
+        self.txt_1.setText('课程表定时通知方式')
+        self.system_msg.setText('系统通知')
+        self.window_msg.setText('弹窗通知')
+        self.system_msg.setChecked(self.data_func['message'][0])
+        self.window_msg.setChecked(self.data_func['message'][1])
+
+        def check():
+            if self.window_msg.isChecked() and self.edit.toPlainText().count('@N') > 1:
+                widgets.QMessageBox.warning(self, '错误', '若设置了 弹窗通知 ，通知内容中最多包含一个“@N”')
+                return False
+            else:
+                return True
 
         def on():
-            self.data_func['func'] = True
+            self.data_func['message'][0] = self.system_msg.isChecked()
             write(r'data\schedule_func.json', json.dumps(self.data_func))
 
         def off():
-            self.data_func['func'] = False
-            write(r'data\schedule_func.json', json.dumps(self.data_func))
+            if check():
+                self.data_func['message'][1] = self.window_msg.isChecked()
+                write(r'data\schedule_func.json', json.dumps(self.data_func))
+            else:
+                self.window_msg.setChecked(False)
 
-        self.on.clicked.connect(on)
-        self.off.clicked.connect(off)
+        self.system_msg.clicked.connect(on)
+        self.window_msg.clicked.connect(off)
 
         self.txt_2.setText('通知内容：')
         self.edit.setPlainText(self.data_func['text'])
@@ -241,8 +240,11 @@ class schedule(widgets.QMainWindow):
         self.edit.setFocus()
 
         def edit():
-            self.data_func['text'] = self.edit.toPlainText()
-            write(r'data\schedule_func.json', json.dumps(self.data_func))
+            if check():
+                self.data_func['text'] = self.edit.toPlainText()
+                write(r'data\schedule_func.json', json.dumps(self.data_func))
+            else:
+                self.edit.setPlainText(self.data_func['text'])
 
         self.edit.textChanged.connect(edit)
 
@@ -263,16 +265,16 @@ class schedule(widgets.QMainWindow):
                                                  int(y2 * h / self.h))
 
         self.table.setGeometry(size(0, 0, 800, 500))
-        self.txt_1.setGeometry(size(25, 525, 100, 25))
-        self.on.setGeometry(size(25, 550, 100, 25))
-        self.off.setGeometry(size(125, 550, 100, 25))
+        self.txt_1.setGeometry(size(25, 525, 200, 25))
+        self.system_msg.setGeometry(size(25, 550, 100, 25))
+        self.window_msg.setGeometry(size(125, 550, 100, 25))
         self.txt_2.setGeometry(size(250, 525, 100, 50))
         self.edit.setGeometry(size(350, 525, 425, 50))
 
         self.table.setFont(font(9))
         self.txt_1.setFont(font(10))
-        self.on.setFont(font(10))
-        self.off.setFont(font(10))
+        self.system_msg.setFont(font(10))
+        self.window_msg.setFont(font(10))
         self.txt_2.setFont(font(10))
         self.edit.setFont(font(9))
         self.table.horizontalHeader().setFont(font(9))

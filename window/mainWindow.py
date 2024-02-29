@@ -7,19 +7,14 @@ import webbrowser
 import time as _time
 import requests
 
-from PyQt5.QtWidgets import QAction
-
 from function.func import *
+from function import setting_file
 
-create(r'data\mainWindow.json', '{"background-image": "bg_blue.png", "main-color": "#1e9fff", "opacity": 80, '
-                                '"width-height": 60, "hide": false, "toolbox": true}')
-# 记得更改配置文件检测
-
-from window import setting, randoms, toolbox, schedule, file_starter, nernge_ai
+from window import setting, randoms, toolbox, schedule, file_starter, nernge_ai, message
 
 data = json.loads(read(r'data\mainWindow.json'))
 
-__version__ = __true_version__ = 'v1.1.1'
+__version__ = __true_version__ = 'v1.1.2'
 
 
 class mainWindow(widgets.QMainWindow):
@@ -46,17 +41,6 @@ class mainWindow(widgets.QMainWindow):
         self.tray_icon = widgets.QSystemTrayIcon(gui.QIcon("data/images/favicon.ico"), self)
         self.tray_icon.hide()
 
-        global data
-        try:
-            type([data['background-image'], data['main-color'], data['opacity'], data['hide'], data['width-height'],
-                  data['toolbox']])
-        except KeyError:
-            write(r'data\mainWindow.json',
-                  '{"background-image": "bg_blue.png", "main-color": "#1e9fff", "opacity": 60, '
-                  '"width-height": 60, "hide": false, "toolbox": true}')
-            data = json.loads(read(r'data\mainWindow.json'))
-            widgets.QMessageBox.information(self, 'Study Plus', '检测到部分配置文件为旧版本或损坏，已经为您重置该配置文件')
-
         self.screen().logicalDotsPerInchChanged.connect(self.setupUI)
         self.resizeEvent = self.setupUI
         self.initUI()
@@ -68,38 +52,51 @@ class mainWindow(widgets.QMainWindow):
         self.file_starter_window = file_starter.file_starter(self)
         self.toolbox_window = toolbox.toolbox(self)
         self.ai_window = nernge_ai.ai(self)
+        self.message_window = message.message(self)
         if data['toolbox']:
             self.toolbox()
         self.tray()
 
         self.thread_run = True
-        self.thread_schedule = QThread(self)
 
-        def run():
-            while self.thread_run:
-                try:
-                    data_ = json.loads(read(r'data\schedule.json'))
-                    data_func = json.loads(read(r'data\schedule_func.json'))
-                    if data_func['func']:
-                        time_now = _time.localtime(_time.time())
-                        week = time_now.tm_wday
-                        if [time_now.tm_hour, time_now.tm_min, time_now.tm_sec] in data_['time']:
-                            lst = []
-                            for time_, i in zip(data_['time'], range(9)):
-                                if [time_now.tm_hour, time_now.tm_min, time_now.tm_sec] == time_:
-                                    lst += [i]
-                            for i in lst:
-                                if ''.join(data_[str(week + 1)][str(i)].split(' ')):
-                                    self.tray_icon.showMessage('课堂提醒',
-                                                               data_func['text'].replace('@N', data_[str(week + 1)][
-                                                                   str(i)]))
-                            _time.sleep(1.1)
-                except json.decoder.JSONDecodeError:
-                    pass
-                if self.thread_run:
-                    _time.sleep(0.01)
+        class thread_schedule(QThread):
+            show_message = core.pyqtSignal(str)
 
-        self.thread_schedule.run = run
+            def __init__(self, parent):
+                super().__init__()
+                self.parent = parent
+
+            def run(self):
+                while self.parent.thread_run:
+                    try:
+                        data_ = json.loads(read(r'data\schedule.json'))
+                        data_func = json.loads(read(r'data\schedule_func.json'))
+                        if data_func['message'][0] or data_func['message'][1]:
+                            time_now = _time.localtime(_time.time())
+                            week = time_now.tm_wday
+                            if [time_now.tm_hour, time_now.tm_min, time_now.tm_sec] in data_['time']:
+                                lst = []
+                                for time_, i in zip(data_['time'], range(9)):
+                                    if [time_now.tm_hour, time_now.tm_min, time_now.tm_sec] == time_:
+                                        lst += [i]
+                                for i in lst:
+                                    if ''.join(data_[str(week + 1)][str(i)].split(' ')):
+                                        if data_func['message'][0]:
+                                            self.parent.tray_icon.showMessage('课程提醒',
+                                                                              data_func['text'].replace('@N',
+                                                                                                        data_
+                                                                                                        [str(week + 1)]
+                                                                                                        [str(i)]))
+                                        if data_func['message'][1]:
+                                            self.show_message.emit(data_[str(week + 1)][str(i)])
+                                _time.sleep(1.1)
+                    except json.decoder.JSONDecodeError:
+                        pass
+                    if self.parent.thread_run:
+                        _time.sleep(0.01)
+
+        self.thread_schedule = thread_schedule(self)
+        self.thread_schedule.show_message.connect(self.show_message)
         self.thread_schedule.start()
 
         self.thread_file_starter = QThread(self)
@@ -150,6 +147,8 @@ class mainWindow(widgets.QMainWindow):
             '@BACKGROUND-IMAGE', data['background-image']
         ).replace(
             '@MAIN-COLOR', data['main-color']
+        ).replace(
+            '@WH', str(int(widgets.QDesktopWidget().screenGeometry().width() * 15 / 1920)) + 'px'
         ))
         try:
             self.setting_window.loadStyle()
@@ -158,6 +157,7 @@ class mainWindow(widgets.QMainWindow):
             self.schedule_window.loadStyle()
             self.file_starter_window.loadStyle()
             self.ai_window.loadStyle()
+            self.message_window.loadStyle()
         except AttributeError:
             pass
 
@@ -253,14 +253,15 @@ class mainWindow(widgets.QMainWindow):
 
     def tray(self):
         menu = widgets.QMenu()
-        act_show = QAction("打开主窗口 (&O)", self)
-        act_exit = QAction("退出 Study Plus (&E)", self)
-        act_randoms = QAction('随机抽号 (&R)', self)
-        act_schedule = QAction('课程表 (&S)', self)
-        act_file_starter = QAction('文件定时启动（&F）', self)
-        act_ai = QAction('Nernge AI（&N）', self)
-        act_setting = QAction('设置 (&S)', self)
-        act_help = QAction('帮助 (&H)', self)
+        act_show = widgets.QAction("打开主窗口 (&O)", self)
+        act_exit = widgets.QAction("退出 Study Plus (&E)", self)
+        act_randoms = widgets.QAction('随机抽号 (&R)', self)
+        act_schedule = widgets.QAction('课程表 (&S)', self)
+        act_file_starter = widgets.QAction('文件定时启动（&F）', self)
+        act_ai = widgets.QAction('Nernge AI（&N）', self)
+        act_setting = widgets.QAction('设置 (&S)', self)
+        act_help = widgets.QAction('帮助 (&H)', self)
+        act_toolbox = widgets.QAction('关闭/打开悬浮球 (&T)', self)
 
         def get_menu(evt):
             if evt == act_show:
@@ -278,6 +279,11 @@ class mainWindow(widgets.QMainWindow):
                 self.ai()
             if evt == act_help:
                 webbrowser.open('https://gitee.com/Nernge/studyplus')
+            if evt == act_toolbox:
+                if self.toolbox_window.isVisible():
+                    self.toolbox_window.hide()
+                else:
+                    self.toolbox_window.show()
             if evt == act_exit:
                 self.thread_run = False
                 _time.sleep(0.01)
@@ -295,6 +301,7 @@ class mainWindow(widgets.QMainWindow):
         menu.addSeparator()
         menu.addAction(act_help)
         menu.addSeparator()
+        menu.addAction(act_toolbox)
         menu.addAction(act_exit)
 
         def tray_icon_clicked(reason):
@@ -318,4 +325,8 @@ class mainWindow(widgets.QMainWindow):
                                                '检测到有可供安装的新版本，是否前往更新？',
                                                widgets.QMessageBox.Yes | widgets.QMessageBox.No) == 16384:
                 webbrowser.open(
-                    'https://gitee.com/Nernge/studyplus/blob/master/Study%20Plus%20Installer.exe')
+                    'https://gitee.com/Nernge/studyplus/raw/master/Study%20Plus%20Installer.exe')
+
+    def show_message(self, evt):
+        self.message_window.class_name = evt
+        self.message_window.show()

@@ -37,7 +37,8 @@ class toolbox(widgets.QWidget):
         self.text = widgets.QLabel(self.main)
 
         self.mainWindow = mainWindow
-        self.move(50, 50)
+        self.move(int(widgets.QDesktopWidget().screenGeometry().width() * 100 / 1920),
+                  int(widgets.QDesktopWidget().screenGeometry().width() * 100 / 1920))
         self.setAttribute(core.Qt.WA_TranslucentBackground)
         self.setWindowFlags(core.Qt.FramelessWindowHint | core.Qt.SplashScreen | core.Qt.WindowStaysOnTopHint)
         self.w = data['width-height']
@@ -55,6 +56,8 @@ class toolbox(widgets.QWidget):
             '@BACKGROUND-IMAGE', data['background-image']
         ).replace(
             '@MAIN-COLOR', data['main-color']
+        ).replace(
+            '@WH', str(int(widgets.QDesktopWidget().screenGeometry().width() * 15 / 1920))+'px'
         ))
 
     def initUI(self):
@@ -77,6 +80,7 @@ class toolbox(widgets.QWidget):
         act_ai = widgets.QAction('Nernge AI（&N）', self)
         act_setting = widgets.QAction('设置 (&S)', self)
         act_help = widgets.QAction('帮助 (&H)', self)
+        act_hide = widgets.QAction('关闭悬浮球 (&C)', self)
 
         def get_menu(evt):
             if evt == act_show:
@@ -94,6 +98,8 @@ class toolbox(widgets.QWidget):
                 self.mainWindow.ai()
             if evt == act_help:
                 webbrowser.open('https://gitee.com/Nernge/studyplus')
+            if evt == act_hide:
+                self.hide()
             if evt == act_exit:
                 self.mainWindow.thread_run = False
                 _time.sleep(0.01)
@@ -111,6 +117,7 @@ class toolbox(widgets.QWidget):
         menu.addSeparator()
         menu.addAction(act_help)
         menu.addSeparator()
+        menu.addAction(act_hide)
         menu.addAction(act_exit)
         menu.triggered[widgets.QAction].connect(get_menu)
 

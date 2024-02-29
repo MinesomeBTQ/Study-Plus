@@ -9,7 +9,6 @@ import shutil
 
 from function.func import *
 
-create('data/file_starter.json', '{"func": true, "time": [0, 0, 0], "file": ""}')
 data = json.loads(read(r'data\mainWindow.json'))
 
 
@@ -46,6 +45,8 @@ class file_starter(widgets.QMainWindow):
             '@BACKGROUND-IMAGE', data['background-image']
         ).replace(
             '@MAIN-COLOR', data['main-color']
+        ).replace(
+            '@WH', str(int(widgets.QDesktopWidget().screenGeometry().width() * 15 / 1920))+'px'
         ))
 
     def initUI(self):

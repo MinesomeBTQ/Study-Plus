@@ -1,15 +1,9 @@
-import os
-
-from PyQt5 import Qt
 from PyQt5 import QtWidgets as widgets
 from PyQt5 import QtCore as core
 from PyQt5 import QtGui as gui
-import json
-import shutil
 
 from function.func import *
 
-create('data/randoms.json', '{"way": true, "num": [0, 50], "import": []}')
 data = json.loads(read(r'data\mainWindow.json'))
 
 
@@ -37,6 +31,7 @@ class randoms(widgets.QMainWindow):
         self.btn_import_replace = widgets.QPushButton(self.import_)
         self.btn_import_add = widgets.QPushButton(self.import_)
         self.btn_clear = widgets.QPushButton(self.import_)
+        self.statistic_txt = widgets.QLabel(self.import_)
 
         self.mainWindow = mainWindow  # 主窗口类
         self.w = 450
@@ -55,6 +50,8 @@ class randoms(widgets.QMainWindow):
             '@BACKGROUND-IMAGE', data['background-image']
         ).replace(
             '@MAIN-COLOR', data['main-color']
+        ).replace(
+            '@WH', str(int(widgets.QDesktopWidget().screenGeometry().width() * 15 / 1920))+'px'
         ))
 
     def initUI(self):
@@ -114,12 +111,18 @@ class randoms(widgets.QMainWindow):
         self.btn_import_add.setText('从文件导入\n(在原内容上添加)')
         self.btn_clear.setText('清除')
 
+        def statistic():
+            self.statistic_txt.setText('共 %s 项' % str(self.list.count()))
+
+        statistic()
+
         def add():
             get = widgets.QInputDialog.getText(self, '输入添加内容', '输入添加内容')
             if get[1]:
                 self.data['import'] += [get[0]]
                 write(r'data\randoms.json', json.dumps(self.data))
                 self.list.addItem(get[0])
+            statistic()
 
         def delete():
             try:
@@ -130,35 +133,39 @@ class randoms(widgets.QMainWindow):
                 del item
             except IndexError:
                 pass
+            finally:
+                statistic()
 
         def import_replace():
             get = widgets.QFileDialog.getOpenFileName(self, '选择导入文件', None, '文本文件(*.txt)')[0]
             if get:
                 text = read(get)
-                get = widgets.QInputDialog.getText(self, '输入分隔符号', '输入分隔符号（如为回车则输入\\n）')
+                get = widgets.QInputDialog.getText(self, '输入分隔符号', '输入分隔符号（如为回车则直接点击OK）')
                 if get[1]:
                     if get[0]:
                         content = text.split(get[0].replace('\\n', '\n'))
                     else:
-                        content = [text]
+                        content = text.split('\n'.replace('\\n', '\n'))
                     self.list.clear()
                     self.list.addItems(content)
                     self.data['import'] = content
                     write(r'data\randoms.json', json.dumps(self.data))
+            statistic()
 
         def import_add():
             get = widgets.QFileDialog.getOpenFileName(self, '选择导入文件', None, '文本文件(*.txt)')[0]
             if get:
                 text = read(get)
-                get = widgets.QInputDialog.getText(self, '输入分隔符号', '输入分隔符号（如为回车则输入\\n）')
+                get = widgets.QInputDialog.getText(self, '输入分隔符号', '输入分隔符号（如为回车则直接点击OK）')
                 if get[1]:
                     if get[0]:
                         content = text.split(get[0].replace('\\n', '\n'))
                     else:
-                        content = [text]
+                        content = text.split('\n'.replace('\\n', '\n'))
                     self.list.addItems(content)
                     self.data['import'] += content
                     write(r'data\randoms.json', json.dumps(self.data))
+            statistic()
 
         def clear():
             if (widgets.QMessageBox.question(self, '清除', '是否要清除所有内容？',
@@ -166,7 +173,9 @@ class randoms(widgets.QMainWindow):
                 self.list.clear()
                 self.data['import'] = []
                 write(r'data\randoms.json', json.dumps(self.data))
+            statistic()
 
+        self.statistic_txt.setAlignment(core.Qt.AlignBottom)
         self.btn_add.clicked.connect(add)
         self.btn_del.clicked.connect(delete)
         self.btn_import_replace.clicked.connect(import_replace)
@@ -204,6 +213,7 @@ class randoms(widgets.QMainWindow):
         self.btn_import_replace.setGeometry(size(225, 105, 150, 50))
         self.btn_import_add.setGeometry(size(225, 165, 150, 50))
         self.btn_clear.setGeometry(size(225, 225, 150, 25))
+        self.statistic_txt.setGeometry(size(225, 355, 150, 25))
 
         self.choose_way.setFont(font(10))
         self.choose_way_num.setFont(font(10))
@@ -220,6 +230,7 @@ class randoms(widgets.QMainWindow):
         self.btn_import_replace.setFont(font(9))
         self.btn_import_add.setFont(font(9))
         self.btn_clear.setFont(font(9))
+        self.statistic_txt.setFont(font(8))
 
     def closeEvent(self, evt):
         if self.mainWindow.isVisible():

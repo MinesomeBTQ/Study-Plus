@@ -209,7 +209,8 @@ QDialog {
 }
 
 QDialog QPushButton {
-    width: 100px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 QTableWidget {
@@ -458,14 +459,6 @@ QListWidget:disabled {
     color: #d2d2d2;
 }
 
-QDialog {
-    background: #FFFFFF;
-}
-
-QDialog QPushButton {
-    width: 100px;
-}
-
 QTableWidget {
     border: 0;
     color: #333333;
@@ -483,8 +476,8 @@ QTableWidget::item:focus {
 QCheckBox::indicator {
     border: 1px solid #d2d2d2;
     border-radius: 4px;
-    width: 15px;
-    height: 15px;
+    width: @WH;
+    height: @WH;
 }
 
 QCheckBox::indicator:hover {
@@ -492,14 +485,14 @@ QCheckBox::indicator:hover {
 }
 
 QCheckBox::indicator:checked {
-    background-image: url("data/images/check.png");
+    border-image: url("data/images/check.png");
 }
 
 QRadioButton::indicator {
     border: 1px solid #d2d2d2;
     border-radius: 4px;
-    width: 15px;
-    height: 15px;
+    width: @WH;
+    height: @WH;
 }
 
 QRadioButton::indicator:hover {
@@ -507,7 +500,7 @@ QRadioButton::indicator:hover {
 }
 
 QRadioButton::indicator:checked {
-    background-image: url("data/images/check.png");
+    border-image: url("data/images/check.png");
 }
 
 QScrollArea {

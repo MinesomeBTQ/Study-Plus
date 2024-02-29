@@ -56,6 +56,8 @@ class ai(widgets.QMainWindow):
             '@BACKGROUND-IMAGE', data['background-image']
         ).replace(
             '@MAIN-COLOR', data['main-color']
+        ).replace(
+            '@WH', str(int(widgets.QDesktopWidget().screenGeometry().width() * 15 / 1920)) + 'px'
         ))
 
     def initUI(self):
@@ -71,7 +73,7 @@ class ai(widgets.QMainWindow):
             self.do_act()
             self.message_user.setPlainText('')
             self.message.setMarkdown('')
-            widgets.QMessageBox.information(self, '清楚上下文记忆', '已清楚上下文记忆')
+            widgets.QMessageBox.information(self, '清空上下文记忆', '已清空上下文记忆')
 
         self.clear.clicked.connect(clear)
 
@@ -106,18 +108,19 @@ class ai(widgets.QMainWindow):
             def run(self):
                 self.signal.emit('@Start')
                 message_out = ''
-                for i in chat(self.message, self.history_message):
+                for i in chat(self.message, self.history_message, json.loads(read(r'data\nernge_ai.json'))['setting']):
                     self.signal.emit(i[0])
                     time.sleep(0.0001)
                     message_out = i[0]
                     exec(i[1])
-                self.signal.emit('@Quit'+message_out)
+                self.signal.emit('@Quit' + message_out)
                 self.quit()
 
         react_ = react()
         react_.signal.connect(self.setMessage)
 
         def send_message():
+            self.message.setMarkdown('...')
             receive_message = self.input.toPlainText()
             if receive_message:
                 receive_message_temp = '以上是我们此前的对话记录：\n'
@@ -165,10 +168,19 @@ class ai(widgets.QMainWindow):
 
         pixmap = gui.QPixmap('data/images/ai.png')
         pixmap.scaled(35, 35, core.Qt.IgnoreAspectRatio, core.Qt.SmoothTransformation)
+
+        def shadow(_, __):
+            effect = widgets.QGraphicsDropShadowEffect(self)
+            effect.setColor(gui.QColor('#FFFFFF'))
+            effect.setBlurRadius(_)
+            effect.setOffset(__)
+            return effect
+
         self.icon.setPixmap(pixmap)
         self.icon.setScaledContents(True)
         self.icon.setGeometry(size(0, 0, 35, 35))
         self.title.setText('Nernge AI - BT.Q')
+        self.title.setGraphicsEffect(shadow(3, 1))
         self.title.setFont(font(12))
         self.title.setGeometry(size(40, 0, 410, 35))
         self.message.setGeometry(size(40, 35, 410, 210))
@@ -204,7 +216,9 @@ class ai(widgets.QMainWindow):
         self.icon_user.setScaledContents(True)
         self.icon_user.setGeometry(size(215, 0, 35, 35))
         self.title_user.setGeometry(size(0, 0, 210, 35))
+
         self.title_user.setText('我')
+        self.title_user.setGraphicsEffect(shadow(3, 1))
         self.title_user.setAlignment(core.Qt.AlignRight | core.Qt.AlignVCenter)
         self.title_user.setFont(font(12))
         self.message_user.setGeometry(size(5, 35, 210, 60))
