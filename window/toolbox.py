@@ -1,15 +1,4 @@
-import os
-
-from PyQt5 import Qt
-from PyQt5 import QtWidgets as widgets
-from PyQt5 import QtCore as core
-from PyQt5 import QtGui as gui
-import json
-import shutil
-import webbrowser
 import time as _time
-
-from PyQt5.QtWidgets import QWidget
 
 from function.func import *
 
@@ -26,14 +15,13 @@ class toolbox(widgets.QWidget):
         self.setWindowTitle('Study Plus')
         self.loadStyle()
 
-        self.main_bg = QWidget(self)
+        self.main_bg = widgets.QWidget(self)
         self.main_bg.setObjectName('toolbox-bg')
         op = widgets.QGraphicsOpacityEffect(self)
         op.setOpacity(data['opacity'] / 100)
         self.main_bg.setGraphicsEffect(op)
-        self.main = QWidget(self)
+        self.main = widgets.QWidget(self)
         self.main.setObjectName('toolbox')
-        self.main.setCursor(Qt.Qt.PointingHandCursor)
         self.text = widgets.QLabel(self.main)
 
         self.mainWindow = mainWindow
@@ -52,13 +40,7 @@ class toolbox(widgets.QWidget):
     def loadStyle(self):
         global data
         data = json.loads(read(r'data\mainWindow.json'))
-        self.setStyleSheet(read(r'data\static\style.qss').replace(
-            '@BACKGROUND-IMAGE', data['background-image']
-        ).replace(
-            '@MAIN-COLOR', data['main-color']
-        ).replace(
-            '@WH', str(int(widgets.QDesktopWidget().screenGeometry().width() * 15 / 1920))+'px'
-        ))
+        self.setStyleSheet(get_style())
 
     def initUI(self):
         self.text.setAlignment(core.Qt.AlignCenter)
